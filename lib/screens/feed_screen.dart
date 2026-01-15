@@ -146,7 +146,10 @@ class _FeedScreenState extends State<FeedScreen> {
             child: ListView.builder(
               itemCount: posts.length,
               itemBuilder: (context, index) {
-                return PostCard(post: posts[index]);
+                return PostCard(
+                  post: posts[index],
+                  currentUsername: widget.username,
+                );
               },
             ),
           );

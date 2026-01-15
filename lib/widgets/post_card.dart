@@ -4,8 +4,9 @@ import '../database/db_helper.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
+  final String currentUsername;
 
-  const PostCard({Key? key, required this.post}) : super(key: key);
+  const PostCard({Key? key, required this.post, required this.currentUsername}) : super(key: key);
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -14,24 +15,56 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   late int likeCount;
   late int commentCount;
-  bool isLiked = false;
+  late bool isLiked;
+  late int currentUserId;
 
   @override
   void initState() {
     super.initState();
     likeCount = widget.post.likeCount;
     commentCount = widget.post.commentCount;
+    _initializeLikeStatus();
   }
 
-  void _toggleLike() {
-    setState(() {
+  Future<void> _initializeLikeStatus() async {
+    // Obtener el userId del usuario actual
+    final user = await DBHelper().getUserByUsername(widget.currentUsername);
+    if (user != null && widget.post.id != null) {
+      currentUserId = user['id'];
+      // Verificar si el usuario ya le dio like
+      final likes = await (await DBHelper().database).query(
+        'likes',
+        where: 'postId = ? AND userId = ?',
+        whereArgs: [widget.post.id!, currentUserId],
+      );
+      setState(() {
+        isLiked = likes.isNotEmpty;
+      });
+    }
+  }
+
+  Future<void> _toggleLike() async {
+    if (currentUserId == null || widget.post.id == null) return;
+
+    try {
       if (isLiked) {
-        likeCount--;
+        // Eliminar like
+        await DBHelper().removeLike(widget.post.id!, currentUserId);
+        setState(() {
+          likeCount--;
+          isLiked = false;
+        });
       } else {
-        likeCount++;
+        // Agregar like
+        await DBHelper().insertLike(widget.post.id!, currentUserId);
+        setState(() {
+          likeCount++;
+          isLiked = true;
+        });
       }
-      isLiked = !isLiked;
-    });
+    } catch (e) {
+      print('Error al cambiar like: $e');
+    }
   }
 
   String _formatDate(String timestamp) {
