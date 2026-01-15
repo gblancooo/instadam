@@ -5,6 +5,7 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'screens/login_screen.dart';
 import 'screens/feed_screen.dart';
 import 'services/preferences_service.dart';
+import 'database/db_helper.dart';
 
 void main() {
   if (kIsWeb) {
@@ -36,6 +37,64 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    _initializeExampleData();
+  }
+
+  Future<void> _initializeExampleData() async {
+    DBHelper dbHelper = DBHelper();
+    
+    // Verificar si ya hay posts de ejemplo
+    List<Map<String, dynamic>> posts = await (await dbHelper.database).query('posts');
+    
+    // Si no hay posts, insertar datos de ejemplo
+    if (posts.isEmpty) {
+      try {
+        // Buscar usuario blanco
+        Map<String, dynamic>? demoUser = await dbHelper.getUserByUsername('blanco');
+        
+        if (demoUser == null) {
+          await dbHelper.insertUser({
+            'username': 'blanco',
+            'password': 'blanco',
+            'email': 'blanco@gmail.com',
+          });
+          demoUser = await dbHelper.getUserByUsername('blanco');
+        }
+        
+        if (demoUser != null) {
+          int demoUserId = demoUser['id'];
+          
+          // posts de ejemplo
+          await dbHelper.insertPost({
+            'userId': demoUserId,
+            'content': 'Primer post INSTADAM ',
+            'imagePath': null,
+            'timestamp': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
+          });
+          
+          await dbHelper.insertPost({
+            'userId': demoUserId,
+            'content': 'Segundo  post INSTADAM ',
+            'imagePath': null,
+            'timestamp': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
+          });
+          
+          await dbHelper.insertPost({
+            'userId': demoUserId,
+            'content': 'Tercer post INSTADAM 🦽',
+            'imagePath': null,
+            'timestamp': DateTime.now().toIso8601String(),
+          });
+        }
+      } catch (e) {
+        print('Error inicializando datos de ejemplo: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(

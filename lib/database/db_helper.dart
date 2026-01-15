@@ -1,5 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../models/post.dart';
+import '../models/comment.dart';
 
 class DBHelper {
   static final DBHelper _instance = DBHelper._internal();
@@ -92,6 +94,116 @@ class DBHelper {
       whereArgs: [username],
     );
     return result.isNotEmpty ? result.first : null;
+  }
+
+  Future<int?> getUserIdByUsername(String username) async {
+    Database db = await database;
+    List<Map<String, dynamic>> result = await db.query(
+      'users',
+      where: 'username = ?',
+      whereArgs: [username],
+      columns: ['id'],
+    );
+    return result.isNotEmpty ? result.first['id'] : null;
+  }
+
+  // Post operations
+  Future<int> insertPost(Map<String, dynamic> post) async {
+    Database db = await database;
+    return await db.insert('posts', post);
+  }
+
+  Future<List<Post>> getPostsByUsername(String username) async {
+    Database db = await database;
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT 
+        p.id, 
+        p.userId, 
+        p.content, 
+        p.imagePath, 
+        p.timestamp,
+        u.username,
+        (SELECT COUNT(*) FROM likes WHERE postId = p.id) as likeCount,
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) as commentCount
+      FROM posts p
+      JOIN users u ON p.userId = u.id
+      WHERE u.username = ?
+      ORDER BY p.timestamp DESC
+    ''', [username]);
+    
+    return result.map((map) => Post.fromMap(map)).toList();
+  }
+
+  Future<List<Post>> getAllPosts() async {
+    Database db = await database;
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT 
+        p.id, 
+        p.userId, 
+        p.content, 
+        p.imagePath, 
+        p.timestamp,
+        u.username,
+        (SELECT COUNT(*) FROM likes WHERE postId = p.id) as likeCount,
+        (SELECT COUNT(*) FROM comments WHERE postId = p.id) as commentCount
+      FROM posts p
+      JOIN users u ON p.userId = u.id
+      ORDER BY p.timestamp DESC
+    ''');
+    
+    return result.map((map) => Post.fromMap(map)).toList();
+  }
+
+  Future<List<Comment>> getCommentsByPostId(int postId) async {
+    Database db = await database;
+    List<Map<String, dynamic>> result = await db.rawQuery('''
+      SELECT 
+        c.id,
+        c.postId,
+        c.userId,
+        c.content,
+        c.timestamp,
+        u.username
+      FROM comments c
+      JOIN users u ON c.userId = u.id
+      WHERE c.postId = ?
+      ORDER BY c.timestamp DESC
+    ''', [postId]);
+    
+    return result.map((map) => Comment.fromMap(map)).toList();
+  }
+
+  Future<int> insertComment(Map<String, dynamic> comment) async {
+    Database db = await database;
+    return await db.insert('comments', comment);
+  }
+
+  Future<int> getLikeCount(int postId) async {
+    Database db = await database;
+    List<Map<String, dynamic>> result = await db.query(
+      'likes',
+      where: 'postId = ?',
+      whereArgs: [postId],
+    );
+    return result.length;
+  }
+
+  Future<int> insertLike(int postId, int userId) async {
+    Database db = await database;
+    return await db.insert(
+      'likes',
+      {'postId': postId, 'userId': userId},
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  Future<int> removeLike(int postId, int userId) async {
+    Database db = await database;
+    return await db.delete(
+      'likes',
+      where: 'postId = ? AND userId = ?',
+      whereArgs: [postId, userId],
+    );
   }
 
   // Add more methods as needed for posts, comments, likes
