@@ -12,11 +12,13 @@ class CreatePostScreen extends StatefulWidget {
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController _contentController = TextEditingController();
+  final TextEditingController _imageUrlController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _contentController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -43,7 +45,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       await DBHelper().insertPost({
         'userId': user['id'],
         'content': _contentController.text,
-        'imagePath': null,
+        'imagePath': _imageUrlController.text.isEmpty ? null : _imageUrlController.text,
         'timestamp': DateTime.now().toIso8601String(),
       });
 
@@ -161,28 +163,26 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Información del tipo de contenido
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info, color: Colors.blue[600]),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Nota: Por ahora solo soportamos texto',
-                      style: TextStyle(
-                        color: Colors.blue[600],
-                        fontSize: 13,
-                      ),
-                    ),
+            // Campo de ruta de imagen
+            TextField(
+              controller: _imageUrlController,
+              decoration: InputDecoration(
+                hintText: 'Ruta de la imagen (opcional)',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: const Icon(Icons.image_outlined),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Colors.purple.shade600,
+                    width: 2,
                   ),
-                ],
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
               ),
             ),
             const SizedBox(height: 32),

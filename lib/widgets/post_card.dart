@@ -139,6 +139,15 @@ class _PostCardState extends State<PostCard> {
                 ? Image.asset(
                     widget.post.imagePath!,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: 80,
+                          color: Colors.grey[400],
+                        ),
+                      );
+                    },
                   )
                 : Center(
                     child: Icon(

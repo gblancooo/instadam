@@ -67,25 +67,25 @@ class _AuthWrapperState extends State<AuthWrapper> {
         if (demoUser != null) {
           int demoUserId = demoUser['id'];
           
-          // posts de ejemplo
+          // Insertar posts de ejemplo
           await dbHelper.insertPost({
             'userId': demoUserId,
             'content': 'Primer post INSTADAM ',
-            'imagePath': null,
+            'imagePath': 'https://s2.abcstatics.com/media/sociedad/2016/02/24/sindrome-down-anciano--620x349.jpg',
             'timestamp': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
           });
           
           await dbHelper.insertPost({
             'userId': demoUserId,
-            'content': 'Segundo  post INSTADAM ',
-            'imagePath': null,
+            'content': 'Segundo post INSTADAM ',
+            'imagePath': 'assets/imagen2.png',
             'timestamp': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
           });
           
           await dbHelper.insertPost({
             'userId': demoUserId,
             'content': 'Tercer post INSTADAM 🦽',
-            'imagePath': null,
+            'imagePath': 'assets/imagen3.png',
             'timestamp': DateTime.now().toIso8601String(),
           });
         }
