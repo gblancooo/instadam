@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/post.dart';
 import '../database/db_helper.dart';
+import '../screens/comments_screen.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
@@ -198,7 +199,14 @@ class _PostCardState extends State<PostCard> {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                      // TODO: Navegar a pantalla de comentarios
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => CommentsScreen(
+                            post: widget.post,
+                            currentUsername: widget.currentUsername,
+                          ),
+                        ),
+                      );
                     },
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
