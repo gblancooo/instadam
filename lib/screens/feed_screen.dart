@@ -4,6 +4,7 @@ import '../models/post.dart';
 import '../widgets/post_card.dart';
 import '../services/preferences_service.dart';
 import 'login_screen.dart';
+import 'create_post_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   final String username;
@@ -31,6 +32,18 @@ class _FeedScreenState extends State<FeedScreen> {
     setState(() {
       _loadPosts();
     });
+  }
+
+  Future<void> _navigateToCreatePost() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => CreatePostScreen(username: widget.username),
+      ),
+    );
+    
+    if (result == true) {
+      _refreshPosts();
+    }
   }
 
   Future<void> _handleLogout() async {
@@ -73,9 +86,7 @@ class _FeedScreenState extends State<FeedScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
-            onPressed: () {
-              // TODO: Navegar a pantalla de crear post
-            },
+            onPressed: _navigateToCreatePost,
           ),
         ],
       ),
@@ -142,8 +153,12 @@ class _FeedScreenState extends State<FeedScreen> {
           return RefreshIndicator(
             onRefresh: () async {
               _refreshPosts();
+              await Future.delayed(const Duration(milliseconds: 500));
             },
+            displacement: 40,
             child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(top: 8),
               itemCount: posts.length,
               itemBuilder: (context, index) {
                 return PostCard(
@@ -156,9 +171,7 @@ class _FeedScreenState extends State<FeedScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Navegar a pantalla de crear post
-        },
+        onPressed: _navigateToCreatePost,
         backgroundColor: Colors.pink.shade500,
         child: const Icon(Icons.add),
       ),
