@@ -5,6 +5,7 @@ import '../widgets/post_card.dart';
 import '../services/preferences_service.dart';
 import 'login_screen.dart';
 import 'create_post_screen.dart';
+import 'profile_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   final String username;
@@ -87,6 +88,14 @@ class _FeedScreenState extends State<FeedScreen> {
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             onPressed: _navigateToCreatePost,
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ProfileScreen(username: widget.username),
+              ));
+            },
           ),
         ],
       ),

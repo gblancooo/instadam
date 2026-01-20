@@ -1,3 +1,5 @@
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/post.dart';
 import '../database/db_helper.dart';
@@ -42,6 +44,68 @@ class _PostCardState extends State<PostCard> {
         isLiked = likes.isNotEmpty;
       });
     }
+  }
+
+  Widget _buildImageWidget(String path) {
+    final uri = Uri.tryParse(path);
+
+    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const Center(child: CircularProgressIndicator());
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Icon(
+              Icons.broken_image,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+          );
+        },
+      );
+    }
+
+    if (!kIsWeb && (uri != null && (uri.scheme == 'file' || path.startsWith('/')) || path.contains('storage')) ) {
+      try {
+        return Image.file(
+          File(path),
+          fit: BoxFit.cover,
+          width: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return Center(
+              child: Icon(
+                Icons.broken_image,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+            );
+          },
+        );
+      } catch (_) {
+        // Fallback a asset si falla
+      }
+    }
+
+    // Por defecto intentamos como asset
+    return Image.asset(
+      path,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      errorBuilder: (context, error, stackTrace) {
+        return Center(
+          child: Icon(
+            Icons.image_not_supported,
+            size: 80,
+            color: Colors.grey[400],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _toggleLike() async {
@@ -136,19 +200,7 @@ class _PostCardState extends State<PostCard> {
             height: 300,
             color: Colors.grey[300],
             child: widget.post.imagePath != null && widget.post.imagePath!.isNotEmpty
-                ? Image.asset(
-                    widget.post.imagePath!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 80,
-                          color: Colors.grey[400],
-                        ),
-                      );
-                    },
-                  )
+                ? _buildImageWidget(widget.post.imagePath!)
                 : Center(
                     child: Icon(
                       Icons.image_not_supported,
