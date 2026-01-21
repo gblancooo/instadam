@@ -60,7 +60,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => FeedScreen(username: username)),
+        MaterialPageRoute(
+          builder: (context) => FeedScreen(
+            username: username,
+            currentLanguage: 'es',
+          ),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -106,13 +111,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).primaryColor;
+    
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue, Colors.purple],
+            colors: [
+              primaryColor,
+              isDarkTheme ? Colors.purple[900]! : Colors.purple,
+            ],
           ),
         ),
         child: Center(
@@ -128,20 +139,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       'INSTA-DAM',
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: primaryColor,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       '¡Bienvenido de vuelta!',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey,
+                        color: isDarkTheme ? Colors.grey[400] : Colors.grey,
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -154,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: isDarkTheme ? Colors.grey[800] : Colors.grey[100],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -167,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: isDarkTheme ? Colors.grey[800] : Colors.grey[100],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -180,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: isDarkTheme ? Colors.grey[800] : Colors.grey[100],
                       ),
                       obscureText: true,
                     ),
@@ -195,7 +206,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                         ),
-                        const Text('Recordarme'),
+                        Text('Recordarme',
+                          style: TextStyle(
+                            color: isDarkTheme ? Colors.white : Colors.black,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -205,7 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: _handleLogin,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -221,14 +237,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: _handleRegister,
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.blue),
+                              side: BorderSide(color: primaryColor),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Registrarse',
-                              style: TextStyle(fontSize: 18, color: Colors.blue),
+                              style: TextStyle(fontSize: 18, color: primaryColor),
                             ),
                           ),
                         ),
