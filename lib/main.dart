@@ -14,23 +14,99 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isDarkTheme = false;
+  String _currentLanguage = 'es';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final isDark = await PreferencesService.isDarkTheme();
+    final language = await PreferencesService.getLanguage();
+    
+    setState(() {
+      _isDarkTheme = isDark;
+      _currentLanguage = language;
+    });
+  }
+
+  void _updateTheme(bool isDark) {
+    setState(() {
+      _isDarkTheme = isDark;
+    });
+  }
+
+  void _updateLanguage(String language) {
+    setState(() {
+      _currentLanguage = language;
+    });
+  }
+
+  void _logout() {
+    // Navegar a LoginScreen
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'InstaDAM',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      theme: _isDarkTheme 
+        ? ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            primaryColor: Colors.blue,
+            colorScheme: ColorScheme.dark(
+              primary: Colors.blue[700]!,
+              secondary: Colors.blueAccent,
+            ),
+          )
+        : ThemeData(
+            useMaterial3: true,
+            primarySwatch: Colors.blue,
+            brightness: Brightness.light,
+            colorScheme: ColorScheme.light(
+              primary: Colors.blue,
+              secondary: Colors.blueAccent,
+            ),
+          ),
+      home: AuthWrapper(
+        onThemeChanged: _updateTheme,
+        onLanguageChanged: _updateLanguage,
+        onLogout: _logout,
+        currentLanguage: _currentLanguage,
       ),
-      home: const AuthWrapper(),
     );
   }
 }
 
 class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
+  final ValueChanged<bool> onThemeChanged;
+  final ValueChanged<String> onLanguageChanged;
+  final VoidCallback onLogout;
+  final String currentLanguage;
+
+  const AuthWrapper({
+    super.key,
+    required this.onThemeChanged,
+    required this.onLanguageChanged,
+    required this.onLogout,
+    required this.currentLanguage,
+  });
 
   @override
   State<AuthWrapper> createState() => _AuthWrapperState();
@@ -115,7 +191,13 @@ class _AuthWrapperState extends State<AuthWrapper> {
                 );
               }
               if (userSnapshot.data != null) {
-                return FeedScreen(username: userSnapshot.data!);
+                return FeedScreen(
+                  username: userSnapshot.data!,
+                  onThemeChanged: widget.onThemeChanged,
+                  onLanguageChanged: widget.onLanguageChanged,
+                  onLogout: widget.onLogout,
+                  currentLanguage: widget.currentLanguage,
+                );
               }
               return const LoginScreen();
             },

@@ -1,0 +1,78 @@
+class Translations {
+  static const Map<String, Map<String, String>> _translations = {
+    'es': {
+      'settings': 'Configuración',
+      'theme': 'Tema',
+      'lightTheme': 'Claro',
+      'darkTheme': 'Oscuro',
+      'notifications': 'Notificaciones',
+      'language': 'Idioma',
+      'logout': 'Cerrar sesión',
+      'spanish': 'Español',
+      'english': 'English',
+      'notification_enabled': 'Notificaciones habilitadas',
+      'notification_disabled': 'Notificaciones deshabilitadas',
+      'logout_confirm': '¿Cerrar sesión?',
+      'logout_success': 'Sesión cerrada correctamente',
+      'cancel': 'Cancelar',
+      'yes': 'Sí',
+      'no': 'No',
+      'profile': 'Perfil',
+      'feed': 'Feed',
+      'create_post': 'Crear Post',
+      'comments': 'Comentarios',
+      'no_posts': 'Sin posts',
+      'username': 'Usuario',
+      'email': 'Correo',
+      'display_name': 'Nombre de mostración',
+      'bio': 'Biografía',
+      'save': 'Guardar',
+      'edit_profile': 'Editar perfil',
+      'liked_by': 'Le gusta a',
+      'comment': 'Comentario',
+      'add_comment': 'Agregar comentario',
+      'send': 'Enviar',
+    },
+    'en': {
+      'settings': 'Settings',
+      'theme': 'Theme',
+      'lightTheme': 'Light',
+      'darkTheme': 'Dark',
+      'notifications': 'Notifications',
+      'language': 'Language',
+      'logout': 'Logout',
+      'spanish': 'Español',
+      'english': 'English',
+      'notification_enabled': 'Notifications enabled',
+      'notification_disabled': 'Notifications disabled',
+      'logout_confirm': 'Logout?',
+      'logout_success': 'Logged out successfully',
+      'cancel': 'Cancel',
+      'yes': 'Yes',
+      'no': 'No',
+      'profile': 'Profile',
+      'feed': 'Feed',
+      'create_post': 'Create Post',
+      'comments': 'Comments',
+      'no_posts': 'No posts',
+      'username': 'Username',
+      'email': 'Email',
+      'display_name': 'Display Name',
+      'bio': 'Bio',
+      'save': 'Save',
+      'edit_profile': 'Edit Profile',
+      'liked_by': 'Liked by',
+      'comment': 'Comment',
+      'add_comment': 'Add comment',
+      'send': 'Send',
+    },
+  };
+
+  static String translate(String key, String languageCode) {
+    return _translations[languageCode]?[key] ?? 
+           _translations['es']?[key] ?? 
+           key;
+  }
+
+  static List<String> getSupportedLanguages() => _translations.keys.toList();
+}

@@ -3,14 +3,27 @@ import '../database/db_helper.dart';
 import '../models/post.dart';
 import '../widgets/post_card.dart';
 import '../services/preferences_service.dart';
+import '../services/translations.dart';
 import 'login_screen.dart';
 import 'create_post_screen.dart';
 import 'profile_screen.dart';
+import 'settings_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   final String username;
+  final ValueChanged<bool>? onThemeChanged;
+  final ValueChanged<String>? onLanguageChanged;
+  final VoidCallback? onLogout;
+  final String currentLanguage;
 
-  const FeedScreen({super.key, required this.username});
+  const FeedScreen({
+    super.key,
+    required this.username,
+    this.onThemeChanged,
+    this.onLanguageChanged,
+    this.onLogout,
+    this.currentLanguage = 'es',
+  });
 
   @override
   State<FeedScreen> createState() => _FeedScreenState();
@@ -18,10 +31,12 @@ class FeedScreen extends StatefulWidget {
 
 class _FeedScreenState extends State<FeedScreen> {
   late Future<List<Post>> _postsFuture;
+  late String _currentLanguage;
 
   @override
   void initState() {
     super.initState();
+    _currentLanguage = widget.currentLanguage;
     _loadPosts();
   }
 
@@ -47,23 +62,41 @@ class _FeedScreenState extends State<FeedScreen> {
     }
   }
 
-  Future<void> _handleLogout() async {
-    await PreferencesService.clearAll();
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    }
+  Future<void> _navigateToSettings() async {
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => SettingsScreen(
+        onThemeChanged: (isDark) {
+          widget.onThemeChanged?.call(isDark);
+        },
+        onLanguageChanged: (language) {
+          setState(() {
+            _currentLanguage = language;
+          });
+          widget.onLanguageChanged?.call(language);
+        },
+        onLogout: () {
+          if (mounted) {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false,
+            );
+            widget.onLogout?.call();
+          }
+        },
+      ),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = (String key) => Translations.translate(key, _currentLanguage);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.logout),
-          onPressed: _handleLogout,
+          icon: const Icon(Icons.settings),
+          onPressed: _navigateToSettings,
         ),
         title: const Text('INSTA-DAM'),
         centerTitle: true,
@@ -139,7 +172,7 @@ class _FeedScreenState extends State<FeedScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No hay posts aún',
+                    t('no_posts'),
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -147,7 +180,7 @@ class _FeedScreenState extends State<FeedScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Crea tu primer post',
+                    t('create_post'),
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[500],
