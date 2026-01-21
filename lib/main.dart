@@ -5,6 +5,7 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'screens/login_screen.dart';
 import 'screens/feed_screen.dart';
 import 'services/preferences_service.dart';
+import 'services/translations.dart';
 import 'database/db_helper.dart';
 
 void main() {
@@ -65,25 +66,25 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'InstaDAM',
-      theme: _isDarkTheme 
-        ? ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.dark,
-            primaryColor: Colors.blue,
-            colorScheme: ColorScheme.dark(
-              primary: Colors.blue[700]!,
-              secondary: Colors.blueAccent,
-            ),
-          )
-        : ThemeData(
-            useMaterial3: true,
-            primarySwatch: Colors.blue,
-            brightness: Brightness.light,
-            colorScheme: ColorScheme.light(
-              primary: Colors.blue,
-              secondary: Colors.blueAccent,
-            ),
-          ),
+      theme: ThemeData(
+        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.light(
+          primary: Colors.blue,
+          secondary: Colors.blueAccent,
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        primaryColor: Colors.blue,
+        colorScheme: ColorScheme.dark(
+          primary: Colors.blue,
+          secondary: Colors.blueAccent,
+        ),
+      ),
+      themeMode: _isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       home: AuthWrapper(
         onThemeChanged: _updateTheme,
         onLanguageChanged: _updateLanguage,
@@ -154,14 +155,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
           await dbHelper.insertPost({
             'userId': demoUserId,
             'content': 'Segundo post INSTADAM ',
-            'imagePath': 'assets/imagen2.png',
+            'imagePath': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Benjamin_Netanyahu%2C_February_2023.jpg/960px-Benjamin_Netanyahu%2C_February_2023.jpg',
             'timestamp': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
           });
           
           await dbHelper.insertPost({
             'userId': demoUserId,
             'content': 'Tercer post INSTADAM 🦽',
-            'imagePath': 'assets/imagen3.png',
+            'imagePath': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDO4gQ1xlWlx9HSvZux-uDYgJf4k3ugsAzdA&s',
             'timestamp': DateTime.now().toIso8601String(),
           });
         }
@@ -199,11 +200,19 @@ class _AuthWrapperState extends State<AuthWrapper> {
                   currentLanguage: widget.currentLanguage,
                 );
               }
-              return const LoginScreen();
+              return LoginScreen(
+                onThemeChanged: widget.onThemeChanged,
+                onLanguageChanged: widget.onLanguageChanged,
+                onLogout: widget.onLogout,
+              );
             },
           );
         }
-        return const LoginScreen();
+        return LoginScreen(
+          onThemeChanged: widget.onThemeChanged,
+          onLanguageChanged: widget.onLanguageChanged,
+          onLogout: widget.onLogout,
+        );
       },
     );
   }

@@ -5,7 +5,16 @@ import '../models/user.dart';
 import 'feed_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final ValueChanged<bool>? onThemeChanged;
+  final ValueChanged<String>? onLanguageChanged;
+  final VoidCallback? onLogout;
+
+  const LoginScreen({
+    super.key,
+    this.onThemeChanged,
+    this.onLanguageChanged,
+    this.onLogout,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -64,6 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (context) => FeedScreen(
             username: username,
             currentLanguage: 'es',
+            onThemeChanged: widget.onThemeChanged ?? (_) {},
+            onLanguageChanged: widget.onLanguageChanged ?? (_) {},
+            onLogout: widget.onLogout ?? () {},
           ),
         ),
       );

@@ -11,17 +11,17 @@ import 'settings_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   final String username;
-  final ValueChanged<bool>? onThemeChanged;
-  final ValueChanged<String>? onLanguageChanged;
-  final VoidCallback? onLogout;
+  final ValueChanged<bool> onThemeChanged;
+  final ValueChanged<String> onLanguageChanged;
+  final VoidCallback onLogout;
   final String currentLanguage;
 
   const FeedScreen({
     super.key,
     required this.username,
-    this.onThemeChanged,
-    this.onLanguageChanged,
-    this.onLogout,
+    required this.onThemeChanged,
+    required this.onLanguageChanged,
+    required this.onLogout,
     this.currentLanguage = 'es',
   });
 
@@ -66,13 +66,13 @@ class _FeedScreenState extends State<FeedScreen> {
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => SettingsScreen(
         onThemeChanged: (isDark) {
-          widget.onThemeChanged?.call(isDark);
+          widget.onThemeChanged(isDark);
         },
         onLanguageChanged: (language) {
           setState(() {
             _currentLanguage = language;
           });
-          widget.onLanguageChanged?.call(language);
+          widget.onLanguageChanged(language);
         },
         onLogout: () {
           if (mounted) {
@@ -81,7 +81,7 @@ class _FeedScreenState extends State<FeedScreen> {
               MaterialPageRoute(builder: (context) => const LoginScreen()),
               (route) => false,
             );
-            widget.onLogout?.call();
+            widget.onLogout();
           }
         },
       ),
