@@ -4,8 +4,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'screens/login_screen.dart';
 import 'screens/feed_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/preferences_service.dart';
-import 'services/translations.dart';
 import 'database/db_helper.dart';
 
 void main() {
@@ -57,7 +57,11 @@ class _MyAppState extends State<MyApp> {
   void _logout() {
     // Navegar a LoginScreen
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      MaterialPageRoute(builder: (context) => LoginScreen(
+        onThemeChanged: _updateTheme,
+        onLanguageChanged: _updateLanguage,
+        onLogout: _logout,
+      )),
       (route) => false,
     );
   }
@@ -178,18 +182,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
       future: _checkRememberedUser(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const SplashScreen();
         }
         if (snapshot.data == true) {
           return FutureBuilder<String?>(
             future: _getUsername(),
             builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
+                return const SplashScreen();
               }
               if (userSnapshot.data != null) {
                 return FeedScreen(
@@ -218,6 +218,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
   }
 
   Future<bool> _checkRememberedUser() async {
+    // Mostrar splash screen durante la carga
+    await Future.delayed(const Duration(seconds: 2));
     return await PreferencesService.getRememberUser();
   }
 

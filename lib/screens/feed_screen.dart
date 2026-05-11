@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
 import '../models/post.dart';
 import '../widgets/post_card.dart';
-import '../services/preferences_service.dart';
 import '../services/translations.dart';
 import 'login_screen.dart';
 import 'create_post_screen.dart';

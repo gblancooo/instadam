@@ -109,7 +109,7 @@ class _PostCardState extends State<PostCard> {
   }
 
   Future<void> _toggleLike() async {
-    if (currentUserId == null || widget.post.id == null) return;
+    if (widget.post.id == null) return;
 
     try {
       if (isLiked) {
